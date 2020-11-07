@@ -1,60 +1,75 @@
+<!-- Always use scoped style for each component-->
+<style src="../node_modules/handsontable/dist/handsontable.full.css"></style>
+
+<style scoped>
+  .user-main{
+    margin-left: 50px;
+  }
+
+  .user-nm {
+    z-index: 1000 !important;
+    position: absolute !important;
+  }
+ 
+</style>
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
-    <v-main>
-      <HelloWorld/>
+    <!-- Navigation Menu located on Components folder-->
+    <NavigationMenu class="user-nm"/>
+    <v-main class="grey lighten-3 user-main">
+      <!-- Using v-if to show component (varible is ChooseMenu)-->
+      <Home v-if="ChooseMenu==1"/>
+      <InputData v-else-if="ChooseMenu==2"/>
+      <InputKd v-else-if="ChooseMenu==3"/>
+      <InputSiswa v-else-if="ChooseMenu==4"/>
+      <InputNilai v-else-if="ChooseMenu==5"/>
+      <OutputRaport v-else-if="ChooseMenu==6" />
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+//import component here
+import NavigationMenu from './components/NavigationMenu'
+import Home from './pages/Home';
+import InputData from './pages/InputData';
+import InputKd from './pages/InputKd';
+import InputSiswa from './pages/InputSiswa';
+import InputNilai from './pages/InputNilai';
+import OutputRaport from './pages/OutputRaport';
 
+// Import bus from main.js
+import {Bus}   from './main';
 export default {
   name: 'App',
 
+  // list of all component
   components: {
-    HelloWorld,
+    NavigationMenu,
+    Home,
+    InputData,
+    InputKd,
+    InputSiswa,
+    InputNilai,
+    OutputRaport
   },
 
+  // store data here
   data: () => ({
-    //
+    ChooseMenu: 1,
   }),
+
+  methods: {
+  },
+
+  // bus here, see vue event lifecycle 
+  created(){
+     Bus.$on('chooseMenu', (data) => {
+      console.log(data);
+      this.ChooseMenu = data;
+    });
+    
+
+  }
 };
 </script>
