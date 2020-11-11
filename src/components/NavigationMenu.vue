@@ -82,13 +82,37 @@
 
 
             <!-- Input Nilai Menu -->
+            <v-list-item-title>
+              <p class="user-nopad overline">Input Nilai</p>
+            </v-list-item-title>
+
             <v-list-item v-bind:class="{'deep-orange accent-3':Activemenu[5]}" v-on:click="chooseMenu(5)">
               <v-list-item-icon>
                 <v-icon>format_list_numbered</v-icon>
               </v-list-item-icon>
   
               <v-list-item-content > 
-                <v-list-item-title > <h3 class = "font-weight-medium">Input Nilai</h3></v-list-item-title>
+                <v-list-item-title > <h3 class = "font-weight-medium">Input Nilai Pengetahuan</h3></v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item v-bind:class="{'deep-orange accent-3':Activemenu[6]}" v-on:click="chooseMenu(6)">
+              <v-list-item-icon>
+                <v-icon>format_list_numbered</v-icon>
+              </v-list-item-icon>
+  
+              <v-list-item-content > 
+                <v-list-item-title > <h3 class = "font-weight-medium">Input Nilai Keterampilan</h3></v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item v-bind:class="{'deep-orange accent-3':Activemenu[7]}" v-on:click="chooseMenu(7)">
+              <v-list-item-icon>
+                <v-icon>format_list_numbered</v-icon>
+              </v-list-item-icon>
+  
+              <v-list-item-content > 
+                <v-list-item-title > <h3 class = "font-weight-medium">Input Nilai Sikap</h3></v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -96,7 +120,7 @@
               <p class="user-nopad overline">Output Data</p>
             </v-list-item-title>
             <!-- Output Menu -->
-            <v-list-item v-bind:class="{'deep-orange accent-3':Activemenu[6]}" v-on:click="chooseMenu(6)">
+            <v-list-item v-bind:class="{'deep-orange accent-3':Activemenu[8]}" v-on:click="chooseMenu(8)">
               <v-list-item-icon>
                 <v-icon>history_edu</v-icon>
               </v-list-item-icon>
@@ -121,13 +145,13 @@
      data () {
       return {
         //variable for menu acsent
-        Activemenu : [false,false,false,false,false,false,false]
+        Activemenu : [false,false,false,false,false,false,false,false,false]
       }
     },
     methods: {
       //function to change menu
       chooseMenu : function(p){
-          this.Activemenu =  [false,false,false,false,false,false,false];
+          this.Activemenu =  [false,false,false,false,false,false,false,false,false];
           this.Activemenu[p] = true;
           // use event bus
           Bus.$emit('chooseMenu', p);

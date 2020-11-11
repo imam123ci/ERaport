@@ -22,8 +22,10 @@
       <InputData v-else-if="ChooseMenu==2"/>
       <InputKd v-else-if="ChooseMenu==3"/>
       <InputSiswa v-else-if="ChooseMenu==4"/>
-      <InputNilai v-else-if="ChooseMenu==5"/>
-      <OutputRaport v-else-if="ChooseMenu==6" />
+      <InputNilaiPengetahuan v-else-if="ChooseMenu==5"/>
+      <InputNilaiKeterampilan v-else-if="ChooseMenu==6"/>
+      <OutputSampul v-else-if="ChooseMenu==8" />
+      <OutputRaport v-else-if="ChooseMenu==9" />
     </v-main>
   </v-app>
 </template>
@@ -35,7 +37,9 @@ import Home from './pages/Home';
 import InputData from './pages/InputData';
 import InputKd from './pages/InputKd';
 import InputSiswa from './pages/InputSiswa';
-import InputNilai from './pages/InputNilai';
+import InputNilaiPengetahuan from './pages/InputNilaiPengetahuan';
+import InputNilaiKeterampilan from './pages/InputNilaiKeterampilan';
+import OutputSampul from './pages/OutputSampul';
 import OutputRaport from './pages/OutputRaport';
 
 // Import bus from main.js
@@ -50,7 +54,9 @@ export default {
     InputData,
     InputKd,
     InputSiswa,
-    InputNilai,
+    InputNilaiPengetahuan,
+    InputNilaiKeterampilan,
+    OutputSampul,
     OutputRaport
   },
 

@@ -11,7 +11,7 @@
         :loading="UI.loading"
     >
         <v-card-title class="pa-4">
-            <h2>Input Nilai</h2>
+            <h2>Input Nilai pengetahuan</h2>
         </v-card-title>
          
         <v-card-subtitle>
@@ -39,11 +39,12 @@
                                    
                 </v-col>
                 <v-col align="right">
-                    <v-btn class="ma-1" color="green lighten-1"> 
+                    <v-btn class="ma-1" color="green lighten-1" @click="saveNilaiAll()"> 
                         <v-icon left>
                         save
                         </v-icon>
                         Save All
+                        
                     </v-btn>
                     <v-btn class="ma-1" color="red lighten-1"> 
                         <v-icon left>
@@ -102,35 +103,33 @@
                     </v-select>
 
                 </v-col >
-                <v-col >  
-                    <v-select
-                        :items="UI.SelectTipe"
-                        label="Tipe"
-                        solo
-                        v-model="UI.SelectedTipe"
-                        @change="getKd()"
+              </v-row>
+              <v-row>
+                <v-col>
+                <h3>Kompetensi Dasar</h3>
+                <v-chip-group
+                mandatory
+                active-class="primary--text"
+                >
+                    <v-chip
+                        v-for="kd in UI.SelectKd"
+                        :key="kd.kdId"
+                        @click="setSelectedKd(kd)"
                     >
-                    </v-select>
-
+                        {{ kd.kdId }}
+                    </v-chip>
+                </v-chip-group>
+                <p>{{this.UI.SelectedKdDesc}}</p>
                 </v-col>
               </v-row>
             
-            <h3>Kompetensi Dasar</h3>
-            <v-select
-                :items="UI.SelectKd"
-                item-text="kd"
-                item-value="kdId"
-                label="Kompetensi dasar"
-                solo
-                v-model="UI.SelectedKd"
-                @change="getNilai()"
-            >
-            </v-select>
+            
             </v-card-text>
          </v-form>
     </v-card>
+   
     <v-spacer class="ma-5"></v-spacer>
-    <v-card v-if="UI.SelectedTipe == 'pengetahuan'">
+     <v-card v-if="UI.SelectedTipe == 'pengetahuan'">
         <v-card-title>
             Nilai Pengetahuan
         </v-card-title>
@@ -148,25 +147,7 @@
          </v-card-actions>
     </v-card>
 
-    <v-spacer class="ma-5"></v-spacer>
-    <v-card v-if="UI.SelectedTipe == 'keterampilan'">
-        <v-card-title>
-            Nilai Keterampilan
-        </v-card-title>
-        <v-card-text >
-             <hot-table name="tblKeterampilan" ref="tblKeterampilan" :settings="tableKeterampilan"></hot-table>
-        </v-card-text>
-         <v-card-actions>
-            <v-btn
-                color="green"
-                text
-                @click="saveNilai"
-            >
-                Save
-            </v-btn>
-         </v-card-actions>
-    </v-card>
-
+    
     <v-snackbar
       v-model="snackbar.status"
       :timeout="snackbar.timeout"
@@ -184,8 +165,8 @@
         </v-btn>
       </template>
     </v-snackbar>
-    
   </v-container>
+  
 </template>
 
 <script>
@@ -208,11 +189,19 @@
             SelectKelas : ["kelas1","kelas2","kelas3","kelas4","kelas5","kelas6"],
             SelectedKelas : "",
             SelectTipe : ['pengetahuan','keterampilan', 'sikap'],
-            SelectedTipe : "",
+            SelectedTipe : "pengetahuan",
             SelectKd : [],
             SelectedKd : "",
+            SelectedKdDesc : "",
             SelectRombel : ['a','b','c','d','e','f','g'],
             SelectedRombel : "",
+        },
+        //store previous UI data
+        UIhist : {
+            SelectedKelas : "",
+            SelectedPelajaran : "",
+            SelectedRombel : "",
+            SelectedKd : ""
         },
         dataKkm :{
             _id : "kkm",
@@ -278,21 +267,17 @@
      methods: {
         refresh(){
            console.log(this.UI);
-           //this.refreshTable('pengetahuan');
+           console.log(this.dataNilai);
+           this.refreshTable('pengetahuan');
         },
-        refreshTable(tableRef){
+        refreshTable(){
             console.log("load table data");
-            if(tableRef == 'pengetahuan'){
-                this.$refs.tblPengetahuan.hotInstance.loadData(this.dataNilai.pengetahuan);
-            }
-            else if(tableRef == 'keterampilan'){
-                this.$refs.tblKeterampilan.hotInstance.loadData(this.dataNilai.keterampilan);
-            }
-
-
+            this.$refs.tblPengetahuan.hotInstance.loadData(this.dataNilai.pengetahuan);
         },
         getPelajaran(){
             this.UI.loading = true;
+            this.UI.SelectPelajaran = [];
+            this.UI.SelectedPelajaran = "";
             this.PelajaranDB.find( 
                 {[this.UI.SelectedKelas] : true},   
                 (err,docs) => {
@@ -309,12 +294,14 @@
             this.UI.loading = false;
         },
         getKd(){
+
             this.UI.loading = true;
+            this.UI.SelectKd = [];
             let kelas = this.UI.SelectedKelas
+            let rombel = this.UI.SelectedRombel;
             let pelajaran = this.UI.SelectedPelajaran;
             let tipe = this.UI.SelectedTipe;
-            if(kelas == "" || pelajaran == "" || tipe == ""){
-                console.log("kosong");
+            if(kelas == "" || pelajaran == "" || tipe == "" || rombel == ""){
                 this.UI.loading = false;
                 return;
             }
@@ -324,66 +311,21 @@
                 (err,docs) =>{
                    if(err){
                         console.log("err" + err);
+                        return;
                     }
-                    console.log(docs);
-                    this.UI.SelectKd = docs;
+                    docs = docs.sort((a,b)=> parseFloat(a.kdId) - parseFloat(b.kdId));
+                     console.log(docs);
+                    if(docs == undefined || docs.length <= 0){
+                        this.setSelectedKd("")
+                        
+                    }else{
+                        this.UI.SelectKd = docs;
+                        this.setSelectedKd(docs[0])
+                    }
                 }
             )
             this.UI.loading = false;
-            this.getNilai();
-            
-        },
-        getNilai(){
-            let kelas = this.UI.SelectedKelas;
-            let rombel = this.UI.SelectedRombel;
-            let tipe = this.UI.SelectedTipe;
-            let kd = this.UI.SelectedKd;
-            let pelajaran = this.UI.SelectedPelajaran;
-            if(kelas == "" || rombel == "" || tipe == "" || kd == "" || pelajaran == ""){
-                console.log("kosong");
-                return;
-            }
 
-            this.NilaiDB.find(
-                {$and:[{"siswa.kelas":kelas},{"siswa.rombel":rombel},{"pelajaran.pelajaran":pelajaran},{"pelajaran.tipe":tipe}, {"pelajaran.kd":kd}]},
-                {_id:0},
-                (err,docs) => {
-                    if(err){
-                        console.log(err);
-                        return;
-                    }
-                    if(docs == undefined || docs.length == 0){
-                        console.log("kosong");
-                        // somehow this code run in asynchronus 
-                        // so i seperate data input and table rendere in other function
-                        if(tipe == 'pengetahuan'){
-                           this.createNilaiPengetahuan();
-                        }
-                        else if(tipe == 'keterampilan'){
-                            this.createNilaiKeterampilan();
-                        }
-                        else if(tipe == 'sikap'){
-                            return;
-                        }
-                    }else{
-                        console.log("tidak kosong");
-                        console.log(docs);
-                        if(tipe == 'pengetahuan'){
-                            this.dataNilai.pengetahuan = docs;
-                            this.refreshTable('pengetahuan');
-                        }
-                        else if(tipe == 'keterampilan'){
-                            this.dataNilai.keterampilan = docs;
-                            this.refresh('keterampilan');
-                        }
-                        else if(tipe == 'sikap'){
-                            this.dataNilai.sikap = docs;
-                        }
-                    } 
-                                  
-                }
-            )
-           
             
         },
         getKkm(){
@@ -398,15 +340,68 @@
                 }
             )
         },
-        saveNilai(){
+        getNilai(){
             this.UI.loading = true;
-            let kelas = this.UI.SelectedKelas;
-            let rombel = this.UI.SelectedRombel;
-            let tipe = this.UI.SelectedTipe;
-            let kd = this.UI.SelectedKd;
-            let pelajaran = this.UI.SelectedPelajaran;
+            let kelas,rombel,tipe,kd,pelajaran = null;
+            kelas = this.UI.SelectedKelas;
+            rombel = this.UI.SelectedRombel;
+            tipe = this.UI.SelectedTipe;
+            kd =  this.UI.SelectedKd;
+            pelajaran = this.UI.SelectedPelajaran;
+            console.log(this.dataNilai);
+            if(kelas == "" || rombel == "" || tipe == "" || kd == "" || pelajaran == ""){
+                this.UI.loading = false;
+                return;
+            }
+
+            this.NilaiDB.find(
+                {$and:[{"siswa.kelas":kelas},{"siswa.rombel":rombel},{"pelajaran.pelajaran":pelajaran},{"pelajaran.tipe":tipe}, {"pelajaran.kd":kd}]},
+                {_id:0},
+                (err,docs) => {
+                    if(err){
+                        console.log(err);
+                        return;
+                    }
+                    if(docs == undefined || docs.length == 0){
+                        // somehow this code run in asynchronus 
+                        // so i seperate data input and table rendere in other function
+                        if(tipe == 'pengetahuan'){
+                           this.createNilaiPengetahuan();
+                        }
+                    }else{
+                        this.dataNilai.pengetahuan = docs;
+                        this.refreshTable(); 
+                    } 
+                                  
+                }
+            )
+            this.UI.loading = false;
+           
+        },
+
+        // isArchive store data without click save
+        saveNilai(isArchive){
+            this.UI.loading = true;
+            let kelas,rombel,tipe,kd,pelajaran = "";
+            if(!isArchive){
+                 kelas = this.UI.SelectedKelas;
+                 rombel = this.UI.SelectedRombel;
+                 tipe = this.UI.SelectedTipe;
+                 kd = this.UI.SelectedKd;
+                 pelajaran = this.UI.SelectedPelajaran;
+            }
+            else{
+                console.log("isArchive");
+                console.log(this.dataNilai);
+                 kelas = this.UIhist.SelectedKelas;
+                 rombel = this.UIhist.SelectedRombel;
+                 tipe = this.UI.SelectedTipe;
+                 kd = this.UIhist.SelectedKd;
+                 pelajaran = this.UIhist.SelectedPelajaran;
+            }
             if(kelas == "" || rombel == "" || tipe == "" || kd == "" || pelajaran == ""){
                 console.log("kosong");
+                this.UI.loading = false;
                 return;
             }
 
@@ -416,41 +411,43 @@
                 (err) => {
                     if(err){
                         console.log(err);
+                        this.UI.loading=false;
+                        return;
                     }
                 }
             );
-
             let dNilai = [];
             if(tipe === 'pengetahuan'){
                 dNilai = this.dataNilai.pengetahuan;
-            }
-            else if(tipe == 'keterampilan'){
-                dNilai = this.dataNilai.keterampilan;
-            }
-            else if(tipe == 'sikap'){
-                dNilai = this.dataNilai.sikap;
             }
 
 
             this.NilaiDB.insert(
                 dNilai,
-                (err, docs)=>{
+                (err)=>{
                     if(err){
                         console.log(err);
                     }
-                    console.log(docs);
                 }
             );
 
             this.UI.loading = false;
         },
         saveNilaiAll(){
-
+            this.notify("Saving Nilai")
+            this.saveNilai();
         },
         deleteNilai(){
-            this.NilaiDB.remove({},{multi:true});
+            this.UI.loading = true;
+            this.UI.loading = false;
         },
+
         // all other method
+        notify(msg){
+            this.snackbar.status = true;
+            this.snackbar.text = msg; 
+        },
+        
         createNilaiPengetahuan(){
             let kelas = this.UI.SelectedKelas;
             let rombel = this.UI.SelectedRombel;
@@ -500,59 +497,25 @@
             )
         },
 
-        createNilaiKeterampilan(){
-            let kelas = this.UI.SelectedKelas;
-            let rombel = this.UI.SelectedRombel;
-            let tipe = this.UI.SelectedTipe;
-            let kd = this.UI.SelectedKd;
-            let pelajaran = this.UI.SelectedPelajaran;
-           
-            this.SiswaDB.find(
-                {$and: [{kelas:kelas},{rombel:rombel}]},
-                {nama:1, NIS:1, NISN:1},
-                (err,docs)=> {
-                    if(err){
-                        console.log(err);
-                        return;
-                    }
-                    let tempNilai = [];
-                    docs.map((s)=>{
-                        tempNilai.push(
-                        {
-                            siswa : {
-                                nama : s.nama,
-                                NIS : s.NIS,
-                                NISN : s.NISN,
-                                kelas : kelas,
-                                rombel : rombel,
-                            },
-                            pelajaran : {
-                                pelajaran : pelajaran,
-                                tipe: tipe,
-                                kd : kd
-                            },
-                            praktik : '',
-                            produk : '',
-                            proyek : '',
-                            nilaiAkhir: '',
-                            predikat : ''
-                        }
-                        )                              
-                    });
 
-                    //check again
-                    if(tipe == 'keterampilan'){
-                        console.log("load keterampilan")
-                        this.dataNilai.keterampilan = tempNilai;
-                        this.refreshTable('keterampilan');
-                    }
-                    
-                }
-            )
-
+        setSelectedKd(k){
+            if(k == ""){
+                console.log("reset KD")
+                this.UI.SelectedKd = "";
+                this.UI.SelectedKdDesc = "";
+                console.log(this.UI.SelectedKd);
+                //since the script work wrong reset data nilai her
+                this.dataNilai.pengetahuan = [];
+                
+            }
+            else{
+                console.log("input KD")
+                this.UI.SelectedKd = k.kdId;
+                this.UI.SelectedKdDesc = k.kd;            
+                this.getNilai();
+            }
         },
-
-      
+     
         averageArr(arr){
             let l = 0;
             let s = 0;
@@ -590,6 +553,7 @@
      },
 
     computed : {
+      
         tablePengetahuan(){
             return{
                 style: 'thead{z-index:-1;}',
@@ -760,8 +724,11 @@
                         tNilai = Math.round((tNilai + Number.EPSILON) * 100) / 100;
                         this.dataNilai.pengetahuan[row].nilaiAkhir = tNilai;
 
-                        
+                        //predikat
                         this.dataNilai.pengetahuan[row].predikat = this.calcPredikat(tNilai);
+
+                        //save
+                        this.saveNilai();
                     }
                     }
                 }
@@ -823,17 +790,14 @@
                     let colPraktik = 1;
                     let colProduk = 2;
                     let colProyek = 3;
-                    console.log("Modify SETket"); 
                     if(ioMode == "set"){
-                        console.log("modify Keterampilan")
-                        console.log("Modify SET Keterampilan");   
-                        console.log(row, columns, ioMode);
+                          console.log(row, columns, ioMode);
                         console.log(valueHolder);
                         let tNK = [0,0,0];
                         if( columns <= 3){
                             tNK[0] = this.dataNilai.keterampilan[row].praktik;
                             tNK[1] = this.dataNilai.keterampilan[row].produk;
-                            tNK[2] = this.dataNilai.keterampilan[row].praktik;
+                            tNK[2] = this.dataNilai.keterampilan[row].proyek;
                         }
                         //sometimes js doesn;t fast enough
                         if(columns == colPraktik){
@@ -855,6 +819,8 @@
                         // calculate predikate
                         this.dataNilai.keterampilan[row].predikat = this.calcPredikat(tNilai);
 
+                        // Save
+                        this.saveNilai();
                     }
                 },
                 

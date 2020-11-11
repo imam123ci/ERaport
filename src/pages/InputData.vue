@@ -384,6 +384,81 @@
       </v-col>
     </v-row>
 
+    <v-row>
+      <v-col>
+      <v-card class="white"  elevation="n - 1">
+      <!-- Form Start Here -->
+      <v-form>
+        <v-card-text>
+          <h2>KKM</h2>
+          <p>Masukan KKM Nilai</p>
+          <v-row>
+            <v-col cols="1" lg="1" md="2" sm="3" xs="3">
+            <v-slider
+                v-model="kkm.kkm"
+                class="align-center"
+                max="100"
+                min="0"
+                vertical
+                @change="CalculateKKM(kkm.kkm)"
+              >
+                <template v-slot:append>
+                  <v-text-field
+                    v-model="kkm.kkm"
+                    class="ma-0 pd-0"
+                    style="text-align:center "
+                    label="KKM"
+                    single-line
+                    type="number"
+                    outlined
+                    dense
+                    @change="CalculateKKM(kkm.kkm)"
+                  ></v-text-field>
+                </template>
+              </v-slider>
+            </v-col>
+            <v-col>
+              <v-simple-table>
+                <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left">
+                      Predikat
+                    </th>
+                    <th class="text-left">
+                      Min
+                    </th>
+                    <th class="text-left">
+                      Max
+                    </th>
+                    <th class="text-left">
+                      Deskripsi
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="k in kkm.ket"
+                    :key="k.predikat"
+                  >
+                    <td>{{ k.predikat }}</td>
+                    <td>{{ k.rentangMin}}</td>
+                    <td>{{ k.rentangMax}}</td>
+                    <td>{{ k.desc }}</td>
+                  </tr>
+                </tbody>
+              </template>
+              </v-simple-table>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-form>
+      <v-card-actions>
+        <v-btn v-on:click="CardSave('kkm')" text>Save</v-btn>
+      </v-card-actions>
+      </v-card>
+      </v-col>
+    </v-row>
 
     
     <!-- Snackbar or Notification html -->
@@ -474,7 +549,18 @@
         list : [
           ]
       },
+      kkm : {
+        _id : "kkm",
+        kkm : 70,
+        interval : 10,
+        ket : [
+          {predikat:'D', rentangMin:0, rentangMax:69.99, desc:"perlu bimbingan"},
+          {predikat:'C', rentangMin:70, rentangMax:79.99, desc:"cukup "},
+          {predikat:'B', rentangMin:80, rentangMax:89.99, desc:"baik"},
+          {predikat:'A', rentangMin:90, rentangMax:99.99, desc:"sangat baik"}
 
+        ]
+      },
       // DB related variable
       db : null,
       test :null,
@@ -529,7 +615,29 @@
       
     },
     methods : {
-
+      //method for calculate kkm
+      CalculateKKM(kkm){
+        let tempKKM = this.kkm.ket;
+        //set kkm u predikat D
+        tempKKM[0].rentangMin = 0;
+        tempKKM[0].rentangMax = (kkm-0.01);
+        //calc inteval
+        let interval = (100 - kkm) / 3;
+        interval = Math.round((interval + Number.EPSILON) * 100) / 100;
+        this.kkm.interval = interval;
+        //set kkm u predikat lain
+        for(let i=1; i< 4; i++){
+          tempKKM[i].rentangMin = kkm + ((i-1)*interval);
+          tempKKM[i].rentangMin = Math.round((tempKKM[i].rentangMin + Number.EPSILON) * 100) / 100;
+          if(i == 3){
+            tempKKM[i].rentangMax = 100;
+          }
+          else{
+            tempKKM[i].rentangMax = kkm + (i*interval) - 0.01;
+            tempKKM[i].rentangMax = Math.round((tempKKM[i].rentangMax + Number.EPSILON) * 100) / 100;
+          }
+        }
+      },
       // Methods for resetting button
       CardDelete(subcard) {
         this.loading = true;
@@ -545,7 +653,6 @@
          }
          // reload Table
           this.$refs.tblPelajaran.hotInstance.loadData(this.pelajaran.list);
-
         }
         else {
           for(let i in eval("this."+subcard)){
@@ -564,12 +671,9 @@
       CardSave(subcard) {
         this.loading = true;
         if(subcard == "pelajaran"){
-          console.log("testp :");
           let pelajarans = this.pelajaran.list
           console.log(pelajarans);
           for(let i in pelajarans){
-            console.log("test :");
-            console.log(pelajarans[i]);
 
             this.PelajaranDB.update(
               {pelajaran : pelajarans[i]['pelajaran']},
@@ -617,6 +721,9 @@
              }
              else if(docs[i]._id == "pelajaran"){
                this.pelajaran = docs[i];
+             }
+             else if(docs[i]._id == "kkm"){
+               this.kkm = docs[i];
              }
              else {
                console.log(err);

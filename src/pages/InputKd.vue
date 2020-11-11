@@ -213,13 +213,23 @@
                 this.UI.loading = false;
                 return;
             }
+            this.dataKd = [];
             this.KdDB.find(
                 {$and: [{kelas:kelas},{pelajaran:pelajaran},{tipe:tipe}]},
                 (err,docs) =>{
                    if(err){
                         console.log("err" + err);
+                        return;
                     }
-                    this.dataKd = docs;
+                    if(docs.length > 0){
+                        this.dataKd = docs;    
+                    }else{
+                        this.dataKd.push({
+                            kdId:"",
+                            kd:""
+                        });
+                    }
+
                     this.$refs.tblKd.hotInstance.loadData(this.dataKd);
 
                 }
