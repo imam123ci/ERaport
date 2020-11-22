@@ -21,7 +21,7 @@
         <v-card-actions>
             <v-row>
                 <v-col>
-                    <v-btn class="ma-1" color="blue lighten-2" @click="console.log('test');"> 
+                    <v-btn class="ma-1" color="blue lighten-2" @click="refresh()"> 
                         <v-icon left>
                         refresh
                         </v-icon>Refresh 
@@ -117,7 +117,7 @@
 
     <v-card>
         <v-container>
-            <v-btn class="ma-0">Tambah</v-btn>
+            <v-btn class="ma-0" @click="tableKD_addRow()">Tambah</v-btn>
             <v-spacer class="ma-3"></v-spacer>
             <hot-table ref="tblKd" :settings="tableKD"></hot-table>
         </v-container>
@@ -185,6 +185,26 @@
          
     }),
     methods: {
+        tableKD_addRow(){
+            let tipe = this.UI.SelectedTipe;
+            let lng = this.dataKd.length+1;
+            if(tipe=='pengetahuan'){
+                this.dataKd.push({
+                    id:lng-1,
+                    kdId:('3.'+lng),
+                    kd:""
+                });
+                console.log("push");
+                console.log(this.dataKd);
+            }
+            else if(tipe=='keterampilan'){
+                this.dataKd.push({
+                    id:lng-1,
+                    kdId:Number('4.'+lng),
+                    kd:""
+                });
+            }            
+        },
         getPelajaran(){
             this.UI.loading = true;
             this.PelajaranDB.find( 
@@ -215,8 +235,9 @@
             }
             this.dataKd = [];
             this.KdDB.find(
-                {$and: [{kelas:kelas},{pelajaran:pelajaran},{tipe:tipe}]},
-                (err,docs) =>{
+                {$and: [{kelas:kelas},{pelajaran:pelajaran},{tipe:tipe}]})
+                .sort({id:1,kdId:1})
+                .exec((err,docs) =>{
                    if(err){
                         console.log("err" + err);
                         return;
@@ -224,10 +245,21 @@
                     if(docs.length > 0){
                         this.dataKd = docs;    
                     }else{
-                        this.dataKd.push({
-                            kdId:"",
-                            kd:""
-                        });
+                        if(tipe=='pengetahuan'){
+                            this.dataKd.push({
+                                id:0,
+                                kdId:3.1,
+                                kd:""
+                            });
+                        }
+                        else if(tipe=='keterampilan'){
+                            this.dataKd.push({
+                                id:0,
+                                kdId:4.1,
+                                kd:""
+                            });
+                        }
+
                     }
 
                     this.$refs.tblKd.hotInstance.loadData(this.dataKd);
@@ -255,8 +287,9 @@
             )
 
             // insert all data
-            this.dataKd.map((k)=>{
+            this.dataKd.map((k,i)=>{
                 delete k._id;
+                k.id = i;
                 k.kelas = kelas;
                 k.pelajaran = pelajaran;
                 k.tipe = tipe;
@@ -275,8 +308,8 @@
             this.snackbar.status = true;
             this.UI.loading = false;
         },
-        Refresh(){
-            
+        refresh(){
+            console.log(this.dataKd);
         },
     },
     computed : {
@@ -294,22 +327,39 @@
                         'undo':{},
                         'redo':{},
                         '---------':{},
-                        'row_above':{},
-                        'row_below':{},
                         'remove_row':{},
                         
                     }
                 },
-                colHeaders: ['No Kd', 'Kompetensi Dasar'],
-                manualColumnResize: [90,100],
+                colHeaders: ['No Kd', 'Kompetensi Dasar','Sem1','Sem2'],
+                manualColumnResize: [90,900,70,70],
                 columns : [
                 {
                     data:'kdId'
                 },
                 {
                     data: 'kd'
+                },
+                {
+                    data: 'semester1',
+                    type : 'checkbox'
+                },
+                {
+                    data: 'semester2',
+                    type : 'checkbox'
                 }
-                ],          
+                ],
+                afterCreateRow :() => {
+                    let tipe = this.UI.SelectedTipe;
+                    let lng = this.dataKd.length-1;
+                    if(tipe == 'pengetahuan'){
+                        this.dataKd[lng].kdId = ("3."+(lng+1));   
+                    }
+                    else if(tipe == 'keterampilan'){
+                        this.dataKd[lng].kdId = ("4."+(lng+1));
+                    }
+
+                }      
             };
         },
     },
@@ -319,7 +369,8 @@
         this.DataDB = new Datastore({ filename: 'DataDB.db', autoload: true });
         this.PelajaranDB = new Datastore({ filename: 'PelajaranDB.db', autoload: true })
         this.KdDB = new Datastore({filename: 'KdDB.db', autoload:true});
-        this.Refresh();
+        
+        
     },
 
 

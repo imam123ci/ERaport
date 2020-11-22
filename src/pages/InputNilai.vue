@@ -320,8 +320,9 @@
             }
             this.KdDB.find(
                 {$and: [{kelas:kelas},{pelajaran:pelajaran},{tipe:tipe}]},
-                {kdId:1, kd:1},
-                (err,docs) =>{
+                )
+                .sort({id:1})
+                .exec((err,docs) =>{
                    if(err){
                         console.log("err" + err);
                     }
@@ -869,6 +870,7 @@
         this.SiswaDB = new Datastore({ filename: 'SiswaDB.db', autoload: true });
         this.NilaiDB = new Datastore({ filename: 'NilaiDB.db', autoload: true });
         this.DataDB = new Datastore({ filename: 'DataDB.db', autoload: true });
+        
     },
     mounted (){
         this.getKkm();

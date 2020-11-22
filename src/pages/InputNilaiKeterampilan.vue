@@ -74,7 +74,7 @@
                         solo
                         v-model="UI.SelectedKelas"
                         @change="getPelajaran()"
-                        
+                        style="z-index:900"
                     >
                     </v-select>
                   </v-col>
@@ -85,7 +85,7 @@
                         solo
                         v-model="UI.SelectedRombel"
                         @change="getNilai()"
-                        
+                        style="z-index:900"
                     >
                     </v-select>
                   </v-col>
@@ -99,6 +99,7 @@
                         solo
                         v-model="UI.SelectedPelajaran"
                         @change="getKd()"
+                        style="z-index:900"
                     >
                     </v-select>
 
@@ -356,8 +357,9 @@
 
             this.NilaiDB.find(
                 {$and:[{"siswa.kelas":kelas},{"siswa.rombel":rombel},{"pelajaran.pelajaran":pelajaran},{"pelajaran.tipe":tipe}, {"pelajaran.kd":kd}]},
-                {_id:0},
-                (err,docs) => {
+                {_id:0})
+                .sort({"siswa.nama":1})
+                .exec((err,docs) => {
                     if(err){
                         console.log(err);
                         return;
@@ -463,17 +465,45 @@
             let tipe = this.UI.SelectedTipe;
             let kd = this.UI.SelectedKd;
             let pelajaran = this.UI.SelectedPelajaran;
-           
+            let agama = ['Budha', 'Islam', 'Protestan', 'Katholik', 'Hindu', 'Konghucu'];
             this.SiswaDB.find(
                 {$and: [{kelas:kelas},{rombel:rombel}]},
-                {nama:1, NIS:1, NISN:1},
-                (err,docs)=> {
+                {nama:1, NIS:1, NISN:1})
+                .sort({nama:1})
+                .exec((err,docs)=> {
                     if(err){
                         console.log(err);
                         return;
                     }
                     let tempNilai = [];
                     docs.map((s)=>{
+                        if(agama.includes(pelajaran)){
+                            if(agama.includes(s.agama)){
+                              tempNilai.push(
+                                {
+                                    siswa : {
+                                        nama : s.nama,
+                                        NIS : s.NIS,
+                                        NISN : s.NISN,
+                                        kelas : kelas,
+                                        rombel : rombel,
+                                    },
+                                    pelajaran : {
+                                        pelajaran : pelajaran,
+                                        tipe: tipe,
+                                        kd : kd
+                                    },
+                                    // defines how many nilai harian u need
+                                    harian : new Array(21).fill(null),
+                                    NPH : "",
+                                    NPTS : '',
+                                    NPAS : '',
+                                    nilaiAkhir: ''
+                                }
+                                );             
+                            }
+                        }
+                        else{
                         tempNilai.push(
                         {
                             siswa : {
@@ -495,8 +525,10 @@
                             NPAS : '',
                             nilaiAkhir: ''
                         }
-                        )                              
+                        );
+                        }                             
                     });
+
                     if(tipe == 'pengetahuan'){
                         this.dataNilai.pengetahuan = tempNilai;
                         
@@ -512,38 +544,66 @@
             let tipe = this.UI.SelectedTipe;
             let kd = this.UI.SelectedKd;
             let pelajaran = this.UI.SelectedPelajaran;
-           
+           let agama = ['Budha', 'Islam', 'Protestan', 'Katolik', 'Hindu', 'Konghucu'];
             this.SiswaDB.find(
                 {$and: [{kelas:kelas},{rombel:rombel}]},
-                {nama:1, NIS:1, NISN:1},
-                (err,docs)=> {
+                {nama:1, NIS:1, NISN:1,agama:1})
+                .sort({nama:1})
+                .exec((err,docs)=> {
                     if(err){
                         console.log(err);
                         return;
                     }
                     let tempNilai = [];
                     docs.map((s)=>{
-                        tempNilai.push(
-                        {
-                            siswa : {
-                                nama : s.nama,
-                                NIS : s.NIS,
-                                NISN : s.NISN,
-                                kelas : kelas,
-                                rombel : rombel,
-                            },
-                            pelajaran : {
-                                pelajaran : pelajaran,
-                                tipe: tipe,
-                                kd : kd
-                            },
-                            praktik : '',
-                            produk : '',
-                            proyek : '',
-                            nilaiAkhir: '',
-                            predikat : ''
+                        if(agama.includes(pelajaran)){
+                            if(s.agama == pelajaran){
+                                tempNilai.push(
+                                    {
+                                        siswa : {
+                                            nama : s.nama,
+                                            NIS : s.NIS,
+                                            NISN : s.NISN,
+                                            kelas : kelas,
+                                            rombel : rombel,
+                                        },
+                                        pelajaran : {
+                                            pelajaran : pelajaran,
+                                            tipe: tipe,
+                                            kd : kd
+                                        },
+                                        praktik : '',
+                                        produk : '',
+                                        proyek : '',
+                                        nilaiAkhir: '',
+                                        predikat : ''
+                                    }
+                                    );
+                            }
                         }
-                        )                              
+                        else{
+                            tempNilai.push(
+                            {
+                                siswa : {
+                                    nama : s.nama,
+                                    NIS : s.NIS,
+                                    NISN : s.NISN,
+                                    kelas : kelas,
+                                    rombel : rombel,
+                                },
+                                pelajaran : {
+                                    pelajaran : pelajaran,
+                                    tipe: tipe,
+                                    kd : kd
+                                },
+                                praktik : '',
+                                produk : '',
+                                proyek : '',
+                                nilaiAkhir: '',
+                                predikat : ''
+                            }
+                            );
+                        }                       
                     });
 
                     //check again
@@ -715,6 +775,7 @@
         this.SiswaDB = new Datastore({ filename: 'SiswaDB.db', autoload: true });
         this.NilaiDB = new Datastore({ filename: 'NilaiDB.db', autoload: true });
         this.DataDB = new Datastore({ filename: 'DataDB.db', autoload: true });
+        
     },
     mounted (){
         this.getKkm();

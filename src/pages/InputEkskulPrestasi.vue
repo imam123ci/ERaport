@@ -129,7 +129,7 @@
   import { HotTable } from '@handsontable/vue';
   
   export default {
-    name: 'InputSiswa',
+    name: 'InputEkskulPrestasi',
     components: {
       HotTable
     },
@@ -146,10 +146,6 @@
             SelectRombel : ["a","b","c","d","e","f","g"],
             SelectedRombel : ""
            
-        },
-        Tblsis:{
-            SelectEkskul : ['Pramuka'],
-            SelectPrestasi:[],
         },
         dataSiswa : [{
             _id:"",
@@ -279,9 +275,7 @@
                     {label:'Ayah',colspan:2},{label:'Ibu',colspan:2}, {label:'Alamat Orang tua',colspan:5}, 
                     {label:'Wali',colspan:3}, 
                     {label:'Tinggi', colspan:2}, {label:'Berat', colspan:2}, 
-                    {label:'Kesehatan', colspan:3}, {label:'Ketidakhadiran', colspan:3},
-                    {label:'Ekstrakulikuler ',colspan:6},{label:'Prestasi',colspan:6},
-                    {label:'Keputusan',colspan:2}
+                    {label:'Kesehatan', colspan:3}, {label:'Ketidakhadiran', colspan:3}
                     ],
                     ['Nama','NIS','NISN','Jenis Kelamin','Agama','TTL',
                     'Nama','Pekerjaan',
@@ -290,10 +284,7 @@
                     'Nama','Pekerjaan','Alamat',
                     'Smt1', 'Smt2', 'Smt1', 'Smt2',
                     'Pendengaran', 'Pengelihatan', 'Gigi', 
-                    'Sakit','Izin', 'Tanpa Keterangan',
-                    'Ekskul 1','Deskripsi','Ekskul 2','Deskripsi','Ekskul 3','Deskripsi',
-                    'Jenis Prestasi 1','Prestasi 1','Jenis Prestasi 2','Prestasi 2','Jenis Prestasi 3', 'Prestasi 3',
-                    'Saran','Lulus/Tinggal'
+                    'Sakit','Izin', 'Tanpa Keterangan'
                     ]
                 ],
                 fixedColumnsLeft: 1,
@@ -400,68 +391,6 @@
                     {
                         data : 'ketidakhadiran.tanpaKeterangan',
                         type : 'numeric'
-                    },
-                    {
-                        data : 'ekstrakurikuler.1.ekskul',
-                        type : 'autocomplete',
-                        strict:false,
-                        source : this.Tblsis.SelectEkskul,
-                    },
-                    {
-                        data : 'ekstrakurikuler.1.deskripsi',
-                    },
-                    {   
-                        data : 'ekstrakurikuler.2.ekskul',
-                        type : 'autocomplete',
-                        strict:false,
-                        source : this.Tblsis.SelectEkskul,
-                    },
-                    {
-                        data : 'ekstrakurikuler.2.deskripsi',
-                    },
-                                        {
-                        data : 'ekstrakurikuler.3.ekskul',
-                        type : 'autocomplete',
-                        strict:false,
-                        source : this.Tblsis.SelectEkskul,
-                    },
-                    {
-                        data : 'ekstrakurikuler.3.deskripsi',
-                    },
-                    {
-                        data : 'prestasi.1.jenis',
-                        type : 'autocomplete',
-                        strict:false,
-                        source : this.Tblsis.SelectPrestasi,
-                    },
-                    {
-                        data : 'prestasi.1.deskripsi'
-                    },
-                    {
-                        data : 'prestasi.2.jenis',
-                        type : 'autocomplete',
-                        strict:false,
-                        source : this.Tblsis.SelectPrestasi,
-                    },
-                    {
-                        data : 'prestasi.2.deskripsi'
-                    },
-                    {
-                        data : 'prestasi.3.jenis',
-                        type : 'autocomplete',
-                        strict:false,
-                        source : this.Tblsis.SelectPrestasi,
-                    },
-                    {
-                        data : 'prestasi.3.deskripsi'
-                    },
-                    {
-                        data : 'saran',
-                    },
-                    {
-                        data : 'lulus',
-                        type: 'dropdown',
-                        source: ['Naik',    'Lulus','Tinggal']
                     }
                 ],
              }

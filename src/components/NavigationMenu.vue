@@ -126,9 +126,45 @@
               </v-list-item-icon>
   
               <v-list-item-content > 
-                <v-list-item-title > <h3 class = "font-weight-medium">Output</h3></v-list-item-title>
+                <v-list-item-title > <h3 class = "font-weight-medium">Jilid & Identitas</h3></v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+
+          <v-list-item v-bind:class="{'deep-orange accent-3':Activemenu[9]}" v-on:click="chooseMenu(9)">
+              <v-list-item-icon>
+                <v-icon>history_edu</v-icon>
+              </v-list-item-icon>
+  
+              <v-list-item-content > 
+                <v-list-item-title > <h3 class = "font-weight-medium">Raport Semester</h3></v-list-item-title>
+              </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item-title>
+            <p class="user-nopad overline">Setting / Pengaturan</p>
+          </v-list-item-title>
+          
+          <v-list-item v-bind:class="{'deep-orange accent-3':Activemenu[10]}" v-on:click="chooseMenu(10)">
+              <v-list-item-icon>
+                <v-icon>settings</v-icon>
+              </v-list-item-icon>
+  
+              <v-list-item-content > 
+                <v-list-item-title > <h3 class = "font-weight-medium">Backup Restore Reset</h3></v-list-item-title>
+              </v-list-item-content>
+              
+          </v-list-item>
+
+          <!-- <v-list-item v-bind:class="{'deep-orange accent-3':Activemenu[11]}" v-on:click="chooseMenu(11)">
+              <v-list-item-icon>
+                <v-icon>settings</v-icon>
+              </v-list-item-icon>
+  
+              <v-list-item-content > 
+                <v-list-item-title > <h3 class = "font-weight-medium">Server Setting</h3></v-list-item-title>
+              </v-list-item-content>
+              
+          </v-list-item> -->
 
           </v-list>
         </v-navigation-drawer>
@@ -145,13 +181,13 @@
      data () {
       return {
         //variable for menu acsent
-        Activemenu : [false,false,false,false,false,false,false,false,false]
+        Activemenu : [false,false,false,false,false,false,false,false,false,false]
       }
     },
     methods: {
       //function to change menu
       chooseMenu : function(p){
-          this.Activemenu =  [false,false,false,false,false,false,false,false,false];
+          this.Activemenu =  [false,false,false,false,false,false,false,false,false,false];
           this.Activemenu[p] = true;
           // use event bus
           Bus.$emit('chooseMenu', p);

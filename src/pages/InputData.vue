@@ -87,11 +87,39 @@
                     v-model="sekolah.NPSN"
                     label="NPSN"
                   ></v-text-field> 
-      
+
+                  <v-text-field
+                    :dense=true
+                    v-model="sekolah.NIS"
+                    label="NIS"
+                  ></v-text-field> 
+                  <v-text-field
+                    :dense=true
+                    v-model="sekolah.tel"
+                    label="Telepon"
+                  ></v-text-field>
+                  <v-text-field
+                    :dense=true
+                    v-model="sekolah.email"
+                    label="Email"
+                  ></v-text-field> 
+                  <v-text-field
+                    :dense=true
+                    v-model="sekolah.web"
+                    label="Website"
+                  ></v-text-field>
+                  </v-col>  
+                  <v-col>
                   <v-text-field
                     :dense=true
                     v-model="sekolah.alamat"
                     label="Alamat Sekolah"
+                  ></v-text-field> 
+
+                  <v-text-field
+                    :dense=true
+                    v-model="sekolah.pos"
+                    label="Kode Pos"
                   ></v-text-field> 
       
                   <v-text-field
@@ -105,18 +133,27 @@
                     v-model="sekolah.dinas"
                     label="Dinas"
                   ></v-text-field> 
-
-                  <v-select
+                   <v-text-field
+                    :dense=true
+                    label="kecamatan"
+                    v-model="sekolah.kecamatan"
+                  ></v-text-field> 
+                  <!-- <v-select
                     :dense=true
                     :items=ikk
                     label="Kabupaten / Kota"
                     v-model="sekolah.kabupaten1"
-                  ></v-select> 
-
+                  ></v-select>  -->
                   <v-text-field
                     :dense=true
-                    v-model="sekolah.kabupaten2"
-                    label="Kabupaten"
+                    v-model="sekolah.kabupaten"
+                    label="Kabupaten/Kota"
+                  ></v-text-field> 
+                  
+                  <v-text-field
+                    :dense=true
+                    v-model="sekolah.provinsi"
+                    label="Provinsi"
                   ></v-text-field> 
 
                 </v-col>
@@ -131,10 +168,8 @@
         </v-card>
       </v-col>
    
-      <v-col>
-        <!-- Identitas Kelas -->
+      <!-- <v-col>
         <v-card class="white"  elevation="n - 1">
-          <!-- Form Start Here -->
           <v-form>
             <v-card-text>
               <h2>Identitas Kelas</h2>
@@ -216,7 +251,7 @@
             </v-card-actions>
           </v-form>
         </v-card>
-      </v-col>
+      </v-col> -->
     </v-row>
 
     <br/>
@@ -575,11 +610,15 @@
           autoRowSize: false,
           autoColumnSize: false,
           data: this.pelajaran.list,
-          colHeaders:['Pelajaran','Kelas 1','Kelas 2','Kelas 3', 'Kelas 4', 'Kelas 5', 'Kelas 6'],
+          colHeaders:['Pelajaran','muatan lokal','Kelas 1','Kelas 2','Kelas 3', 'Kelas 4', 'Kelas 5', 'Kelas 6'],
           stretchH: 'all',
           columns: [
             {
               data : 'pelajaran'
+            },
+            {
+              data : 'mulok',
+              type : 'checkbox'
             },
             {
               data : 'kelas1',
