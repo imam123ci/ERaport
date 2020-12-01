@@ -14,13 +14,17 @@
   "main": "background.js",
   "dependencies": {
     "@handsontable/vue": "^5.1.0",
+    "chart.js": "^2.9.4",
     "core-js": "^3.6.5",
     "docx-templates": "^4.5.1",
+    "gotenberg-js-client": "^0.6.2",
     "handsontable": "^8.1.0",
+    "mammoth": "^1.4.14",
     "material-design-icons-iconfont": "^6.1.0",
     "moment": "^2.29.1",
     "nedb": "^1.8.0",
     "vue": "^2.6.11",
+    "vue-async-computed": "^3.9.0",
     "vuetify": "^2.2.11"
   },
   "devDependencies": {

@@ -177,11 +177,26 @@
 
     methods : {
         refresh(){
-
-            console.log(this.UI);
             this.getDataSiswa();
+        },
+        getDefaultKelas(){
+            return new Promise((resolve,reject)=>{
+            this.DataDB.find(
+                {_id:'kelasdefault'},
+                {kelas:1,rombel:1},
+                (err,docs)=>{
+                if(err){
+                    console.log(err);
+                    reject(err);
+                }
+                this.UI.SelectedKelas = docs[0].kelas;
+                this.UI.SelectedRombel = docs[0].rombel;
+                resolve(docs[0]);
+                }
+            );
 
-        
+            }); 
+                    
         },
         getDataSiswa(){
             if(this.UI.SelectedRombel == "" || this.UI.SelectedKelas  == ""){
@@ -474,7 +489,8 @@
     created (){
         let Datastore = require('nedb');
         this.SiswaDB = new Datastore({ filename: 'SiswaDB.db', autoload: true });
-        
+        this.DataDB = new Datastore({ filename: 'DataDB.db', autoload: true });  
+        this.getDefaultKelas();
     }
 }
     

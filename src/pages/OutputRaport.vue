@@ -87,6 +87,102 @@ Note :
        
     </v-card>
     
+    <v-spacer class="ma-5"></v-spacer>
+    <v-expansion-panels>
+      <!-- <v-expansion-panel>
+        <v-expansion-panel-header>
+          Pengaturan
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-row>
+            <v-col>
+              <v-select
+              label="Cara Menerima File"
+              :items="pengaturan.SelectCara"
+              @change="changePengaturan()"
+              >
+              </v-select>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-text-field 
+              label="Path Template"
+              @change="changePengaturan()">
+              </v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field 
+              label="Path Destinasi"
+              @change="changePengaturan()">
+              </v-text-field>
+            </v-col>
+          </v-row>          
+        </v-expansion-panel-content>
+      </v-expansion-panel> -->
+
+      <v-expansion-panel>
+        <v-expansion-panel-header>
+          Log
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <div style="height:200px; overflow-y:scroll;">
+          </div>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+
+      <v-expansion-panel>
+        <v-expansion-panel-header>
+          Hasil
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-data-table
+            :headers="tableHasil.headers"
+            :items="dataRaport"
+            :items-per-page="15"
+            class="elevation-1"
+          >
+            <template v-slot:[`item.actions`]="{ item }">
+              <v-icon
+                small
+                class="mr-2"
+                @click="downloadRaport(item)"
+              >
+                mdi-download
+              </v-icon>
+              <v-icon
+                small
+                @click="printRaport(item)"
+              >
+                mdi-printer
+              </v-icon>
+            </template>
+
+          </v-data-table>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+  
+    
+    </v-expansion-panels>
+  
+
+    <v-snackbar
+      v-model="snackbar.status"
+      :timeout="snackbar.timeout"
+    >
+      {{ snackbar.text }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="blue"
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -119,6 +215,29 @@ Note :
             Ddate: new Date().toISOString().substr(0, 10),
             DateMenu:""
         },
+        tableHasil : {
+          headers : [
+            {
+              text : "Nama",
+              align: 'start',
+              sortable : true,
+              value : 'siswa.nama'
+            },
+            {
+              text : "NIS",
+              value : 'siswa.NIS'
+            },
+            {
+              text : "NISN",
+              value : 'siswa.NISN'
+            },
+            {
+              text : " ",
+              value : 'actions'
+            }
+          ]
+        },
+        dataRaport:[],
         dataKkm:{
 
         },
@@ -130,7 +249,11 @@ Note :
         ]
     }),
     methods: {
-   
+      notify(msg){
+        this.snackbar.status = true;
+        this.snackbar.text = msg; 
+      },
+
       getKkm(){
           this.DataDB.find( 
               {_id:'kkm'}, 
@@ -156,7 +279,6 @@ Note :
           if(err){
             console.log(err);
           }
-          console.log(docs);
           this.dataDasar = docs;
           this.prepareData();
         });
@@ -219,7 +341,6 @@ Note :
             else if(semester == 'Semester 2'){
               syarat.$and.push({semester2 : true});
             }
-            console.log(syarat);
             this.KdDB.find(
               syarat,
               {kdId:1,pelajaran:1,tipe:1},
@@ -281,7 +402,7 @@ Note :
         return new Promise((resolve, reject)=>{
           let pelajaran = [];
           let syarat = {[kelas]:true};
-          console.log(syarat);
+  
           setTimeout(()=>{
             this.PelajaranDB.find(
               syarat,
@@ -395,7 +516,8 @@ Note :
                   for(let i=0;i<docs.length;i++){
                     tempNilai.push(docs[i].nilaiAkhir);
                   }
-                  nilaiKeterampilan = this.calcNilai(syarat.siswa.nama,syarat.kd.pelajaran, 'keterampilan',syarat.kd.pengetahuandesc,tempNilai);
+                  nilaiKeterampilan = this.calcNilai(syarat.siswa.nama,syarat.kd.pelajaran, 'keterampilan',syarat.kd.keterampilandesc,tempNilai);
+                  
                   resolve({
                     pelajaran : syarat.kd.pelajaran,
                     pengetahuan : nilaiPengetahuan,
@@ -529,6 +651,35 @@ Note :
 
       },
 
+
+      //Download and print
+       async downloadRaport(item){
+        let template;
+        if(this.UI.SelectedSemester == 'Semester 2'){
+          template = fs.readFileSync('./Templates/templateSemester2.docx');
+        }
+        else {
+          template = fs.readFileSync('./Templates/templateSemester1.docx');
+        }
+
+        let buffer = await createReport({
+          template,
+          data : item
+        });
+
+        const blob = new Blob([buffer], {type: 'text/docx'})
+        // create download dialog
+        const e = document.createEvent('MouseEvents'),
+        a = document.createElement('a');
+        a.download = item.namaFile +".docx";
+        a.href = window.URL.createObjectURL(blob);
+        a.dataset.downloadurl = ['text/docx', a.download, a.href].join(':');
+        e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        a.dispatchEvent(e);
+      },
+      printRaport(){
+
+      },
       //populate word or create raport
       async createR(dtTanggal,dtSiswa, dtDasar, dtKepala , dtGuru,dtNilai, dtNilaiSikap){
         let dtAll = {
@@ -540,22 +691,27 @@ Note :
           dtn: dtNilai,
           dtns:dtNilaiSikap
         }
-        console.log("test templates");
-        console.log(dtAll);
+        let namaFile,template
 
-        const template = fs.readFileSync('./Templates/templateSemester1.docx');
+        if(this.UI.SelectedSemester == 'Semester 2'){
+          namaFile = "Sem2"+dtSiswa.kelas+dtSiswa.rombel+"_"+dtSiswa.nama+"_"+dtSiswa.NIS;
+          template = fs.readFileSync('./Templates/templateSemester2.docx');
+        }
+        else {
+          namaFile = "Sem1"+dtSiswa.kelas+dtSiswa.rombel+"_"+dtSiswa.nama+"_"+dtSiswa.NIS;
+          template = fs.readFileSync('./Templates/templateSemester1.docx');
+        }
 
         let buffer = await createReport({
           template,
           data : dtAll,
         })
-        let nm = "Sem1"+dtSiswa.kelas+dtSiswa.rombel+"_"+dtSiswa.nama+"_"+dtSiswa.NIS;
-        fs.writeFileSync('./Raport/Semester1/'+nm+'.docx',buffer);
+
+        fs.writeFileSync('./Raport/Semester1/'+namaFile+'.docx',buffer);
       },
 
       //Preparing all data
       async prepareData(){
-        console.log("prepare data");
         // all usefull varible and hardcode one
         let kelas = this.UI.SelectedKelas;
         let rombel = this.UI.SelectedRombel;
@@ -625,6 +781,8 @@ Note :
           tempkd.sikapdesc = await this.getKDgroup(pel[i],'sikap',kelas,semester,false);
           kd.push(tempkd);
         }
+        // console.log("get Kd group")
+        // console.log(kd);
         
 
         // configure all template 
@@ -665,7 +823,7 @@ Note :
             lulus:"",
 
         };
-        console.log(dtDasar,dtKepala);
+
       
         //getnilai
         //looping per siswa here
@@ -680,7 +838,7 @@ Note :
           }
           dts = {...templatesiswa, ...dts};
 
-          console.log(dts);
+
           dtNilai = {};
           let s = {
                 siswa : {
@@ -698,6 +856,7 @@ Note :
             s.kd = dtkd;
             let tempdtNilai = await this.getNilai(s);
             
+            
             if(agama.includes(dtkd.pelajaran))
             {
               if(dts.agama == dtkd.pelajaran){
@@ -711,8 +870,23 @@ Note :
           }
 
           //create word
-          this.createR(dtt,dts,dtDasar,dtKepala,dtGuru,dtNilai,dtNilaiSikap);
+          this.createR(dtt,dts,dtDasar,dtKepala,dtGuru,dtNilai,dtNilaiSikap);          
+          //async createR(dtTanggal,dtSiswa, dtDasar, dtKepala , dtGuru,dtNilai, dtNilaiSikap){
+
+          //push to array
+          this.dataRaport.push(
+            {
+              siswa : dts,
+              dtt : dtt,
+              dtk : dtKepala,
+              dts : dtDasar,
+              dtg : dtGuru,
+              dtn: dtNilai,
+              dtns:dtNilaiSikap
+            }
+          )
         }
+        this.notify("Generared Raport");
 
       },
 

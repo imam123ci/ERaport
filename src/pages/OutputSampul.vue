@@ -69,17 +69,24 @@ Note :
           <v-row>
             <v-col>
               <v-select
-              label="Cara Menerima File">
+              label="Cara Menerima File"
+              :items="pengaturan.SelectCara"
+              @change="changePengaturan()"
+              >
               </v-select>
             </v-col>
           </v-row>
           <v-row>
             <v-col>
-              <v-text-field label="Path Template">
+              <v-text-field 
+              label="Path Template"
+              @change="changePengaturan()">
               </v-text-field>
             </v-col>
             <v-col>
-              <v-text-field label="Path Destinasi">
+              <v-text-field 
+              label="Path Destinasi"
+              @change="changePengaturan()">
               </v-text-field>
             </v-col>
           </v-row>          
@@ -91,16 +98,39 @@ Note :
           Log
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+          <div style="height:200px; overflow-y:scroll;">
+          </div>
         </v-expansion-panel-content>
       </v-expansion-panel>
 
       <v-expansion-panel>
         <v-expansion-panel-header>
-          Data
+          Hasil
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+          <v-data-table
+            :headers="tableHasil.headers"
+            :items="dataSampul"
+            :items-per-page="5"
+            class="elevation-1"
+          >
+            <template v-slot:[`item.actions`]="{ item }">
+              <v-icon
+                small
+                class="mr-2"
+                @click="downloadSampul(item)"
+              >
+                mdi-download
+              </v-icon>
+              <v-icon
+                small
+                @click="printSampul(item)"
+              >
+                mdi-printer
+              </v-icon>
+            </template>
+
+          </v-data-table>
         </v-expansion-panel-content>
       </v-expansion-panel>
   
@@ -113,7 +143,6 @@ Note :
 <script>
   import createReport from 'docx-templates';
   import fs from 'fs';
-
   export default {
     name: 'OutputSampul',
 
@@ -125,6 +154,34 @@ Note :
             status : false,
             timeout : 1000,
             text : ""
+        },
+        pengaturan :{
+          SelectCara : ["download","fs"],
+          SelectedCara : "",
+          PathTemplate : "",
+          PathDestinasi : "",
+        },
+        tableHasil : {
+          headers : [
+            {
+              text : "Nama",
+              align: 'start',
+              sortable : true,
+              value : 'siswa.nama'
+            },
+            {
+              text : "NIS",
+              value : 'siswa.NIS'
+            },
+            {
+              text : "NISN",
+              value : 'siswa.NISN'
+            },
+            {
+              text : " ",
+              value : 'actions'
+            }
+          ]
         },
         UI : {
             loading : false,
@@ -142,9 +199,33 @@ Note :
         ],
         dataDasar : [
 
+        ],
+        dataSampul : [
+
         ]
     }),
     methods: {
+      async printSampul(item){
+        console.log(item);
+      },
+      async downloadSampul(item){
+        const template = fs.readFileSync('./Templates/templatesSampul.docx');
+        console.log(template.toJSON());
+        let buffer = await createReport({
+          template,
+          data : item
+        });
+
+        const blob = new Blob([buffer], {type: 'text/docx'})
+        // create download dialog
+        const e = document.createEvent('MouseEvents'),
+        a = document.createElement('a');
+        a.download = item.namaFile +".docx";
+        a.href = window.URL.createObjectURL(blob);
+        a.dataset.downloadurl = ['text/docx', a.download, a.href].join(':');
+        e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        a.dispatchEvent(e);
+      },
       async createR(dtDasar, dtKepala,dtSiswa, nmFile){
         const template = fs.readFileSync('./Templates/templatesSampul.docx');
         console.log(template.toJSON());
@@ -294,8 +375,19 @@ Note :
 
         for(let i=0; i< dtSiswa.length; i++){
           let nm = "Sampul"+kelas+rombel+"_"+dtSiswa[i].nama+"_"+dtSiswa[i].NIS;
-          this.createR(dtDasar,dtKepala,dtSiswa[i],nm);  
+          this.createR(dtDasar,dtKepala,dtSiswa[i],nm); 
+          this.dataSampul.push(
+            {
+              dt : dtDasar,
+              kp : dtKepala,
+              siswa : dtSiswa[i],
+              namaFile : nm
+            }
+          )
         }
+      },
+      changePengaturan(){
+        
       }
 
     },
