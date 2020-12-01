@@ -1,24 +1,22 @@
 # eraport
 
+Software ini merupakan Eraport yang diperuntukan untuk SD.
+Software dibuat menggunakan vuejs,nodejs, dan Electron.
+
 ## Project setup
 ```
 yarn install
 ```
 
-### Compiles and hot-reloads for development
+
+### Project Development & Production
+Use vue-electron-builder plugin for production and developement.
+Develope
 ```
-yarn serve
+yarn eletron:serve
+```
+Build
+```
+yarn electron:build
 ```
 
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

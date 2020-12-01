@@ -1,6 +1,8 @@
 {
   "name": "eraport",
   "version": "0.1.0",
+  "author" : "TrisnacodeMC1",
+  "description": "Program E Raport untuk SD",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -9,7 +11,8 @@
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps"
+    "postuninstall": "electron-builder install-app-deps",
+    "electron:generate-icons": "electron-icon-builder --input=./public/icon.png --output=build --flatten"
   },
   "main": "background.js",
   "dependencies": {
