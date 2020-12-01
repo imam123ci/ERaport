@@ -4,6 +4,7 @@
 </style>
 
 <template>
+
   <v-container>
 
     <v-card class="white">
@@ -181,17 +182,6 @@
                 </v-card-text>
               </v-card>
           </v-col>
-          <!-- <v-col>
-            <v-card
-              class="mx-auto">
-                <v-card-text>
-                  <div>Nilai Belum diisi</div>
-                  <p class="display-1 text--primary">
-                    40
-                  </p>
-                </v-card-text>
-              </v-card>
-          </v-col> -->
         </v-row>
         <h3>Kelas</h3>
         <v-row>         
@@ -376,10 +366,8 @@
       nilaiRataRata : null,
       
     }),
-    computed : {      
-    },
     methods : {
-      async refresh(){
+    async refresh(){
         // Seluruh
         this.totalMurid = await this.getTotalMurid();
         this.totalPelajaran = await this.getTotalPelajaran();
@@ -388,7 +376,7 @@
 
         //kelas
         this.totalMuridKelas = await this.getTotalMuridKelas();
-      },
+    },
       notify(msg){
         this.snackbar.status = true;
         this.snackbar.text = msg; 
@@ -403,9 +391,14 @@
                 console.log(err);
                 reject(err);
               }
-              this.UI.SelectedKelas = docs[0].kelas;
-              this.UI.SelectedRombel = docs[0].rombel;
-              resolve(docs[0]);
+              if(docs.length > 0){
+                this.UI.SelectedKelas = docs[0].kelas;
+                this.UI.SelectedRombel = docs[0].rombel;
+                resolve(docs[0]);
+              }
+              else{
+                resolve(null)
+              }
             }
           );
 
@@ -740,17 +733,10 @@
 
       async prepareData(){
         //check if data is null or not
-        this.DataDB.count({},(err,cnt)=>{
-          if(err){
-            this.notify(err);
-            return;
-          }
-          if(cnt <= 0){
-            this.UI.pertama = true;
-          }
-        })
-
-        await this.getDefaultKelas();
+        if(!await this.getDefaultKelas()){
+          console.log("no default kelas")
+          return;
+        }
 
         // all usefull varible and hardcode one
         let kelas = this.UI.SelectedKelas;
@@ -765,6 +751,7 @@
         //get pelajaran dan KD
         dtSiswa = await this.getSiswa(kelas,rombel);
         pel = await this.getPelajaran(kelas);
+        console.log(semester,dtSiswa,pel,kd,dtNilai,agama);
         // select kd group by pelajaran and tipe
         // ['pengetahuan','keterampilan', 'sikap'];
         for(let i=0;i<pel.length;i++){
@@ -776,7 +763,7 @@
         }
         
 
-        // configure all template      
+        //configure all template      
         let templatesiswa = {
             _id:"",
             kelas:"",
@@ -901,14 +888,17 @@
 
         this.graph2.data.labels = headersPelajaran;
         this.graph2.data.datasets[0].data = nilaiPerPelajaran;
+        this.graph2.data.datasets[0].backgroundColor = 'rgb(54, 162, 235)';
         this.graph2.update();
         
         
       }
 
     },
-    async mounted() {
-      this.prepareData();
+    mounted() {
+      
+
+      //this.prepareData();
       //select temp headers
 
 
@@ -954,15 +944,15 @@
       })
     },
     created (){
-        let Datastore = require('nedb');
-        this.SiswaDB = new Datastore({ filename: 'SiswaDB.db', autoload: true });
-        this.DataDB = new Datastore({ filename: 'DataDB.db', autoload: true });  
-        this.NilaiDB = new Datastore({ filename: 'NilaiDB.db', autoload: true });  
-        this.PelajaranDB = new Datastore({ filename: 'PelajaranDB.db', autoload: true })
-        this.KdDB = new Datastore({filename: 'KdDB.db', autoload:true});
+      let Datastore = require('nedb');
+      this.SiswaDB = new Datastore({ filename: 'SiswaDB.db', autoload: true });
+      this.DataDB = new Datastore({ filename: 'DataDB.db', autoload: true });  
+      this.NilaiDB = new Datastore({ filename: 'NilaiDB.db', autoload: true });  
+      this.PelajaranDB = new Datastore({ filename: 'PelajaranDB.db', autoload: true })
+      this.KdDB = new Datastore({filename: 'KdDB.db', autoload:true});
 
-        //
-        this.refresh();
+      this.refresh();
+      this.prepareData();
     }
 
   }
