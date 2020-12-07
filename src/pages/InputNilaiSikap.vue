@@ -317,10 +317,44 @@
     }),
      methods: {
         async refresh(){
-           console.log(this.dataLS);
-           await this.getAllLuaranSikap();
-           this.refreshTable();
+            let isExist = await this.checkIfDBExist();
+            if(isExist){
+                this.getDefaultKelas();
+                this.getKkm();
+                await this.getAllLuaranSikap();
+            }
         },
+        async checkIfDBExist(){
+            const dt =  new Promise((resolve,rejects)=>{
+            this.DataDB.find(
+            {},
+            (err,docs)=>{
+              if(err){
+                rejects(false);
+              }
+              else{
+                if(docs.length < 1){
+                  rejects(false)
+                }else{
+                  resolve(true);
+                }
+              }
+            })
+            });
+
+            await dt.then(
+                (rs) =>{
+                if(rs)
+                    return(true);
+                },
+                (rj)=>{
+                if(!rj)
+                    console.log(rj);
+                return(false)
+                }
+            )
+        },
+
         refreshTable(){
             this.$refs.tblSikap.hotInstance.loadData(this.dataNilai.sikap);
             //this.$refs.tblDl.hotInstance.loadData(this.dataLS);
@@ -693,10 +727,9 @@
         this.SiswaDB = new Datastore({ filename: 'SiswaDB.db', autoload: true });
         this.NilaiDB = new Datastore({ filename: 'NilaiDB.db', autoload: true });
         this.DataDB = new Datastore({ filename: 'DataDB.db', autoload: true });
-        this.getDefaultKelas();
+        
     },
     mounted (){
-        this.getAllLuaranSikap();
     }
   }
 </script>

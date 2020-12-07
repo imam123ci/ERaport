@@ -266,8 +266,42 @@
         },
     }),
      methods: {
-        refresh(){
-           this.refreshTable('pengetahuan');
+        async refresh(){
+            let isExist = await this.checkIfDBExist();
+            if(isExist){
+                this.getDefaultKelas();
+                this.getKkm();
+            }
+        },
+        async checkIfDBExist(){
+            const dt =  new Promise((resolve,rejects)=>{
+            this.DataDB.find(
+            {},
+            (err,docs)=>{
+              if(err){
+                rejects(false);
+              }
+              else{
+                if(docs.length < 1){
+                  rejects(false)
+                }else{
+                  resolve(true);
+                }
+              }
+            })
+            });
+
+            await dt.then(
+                (rs) =>{
+                if(rs)
+                    return(true);
+                },
+                (rj)=>{
+                if(!rj)
+                    console.log(rj);
+                return(false)
+                }
+            )
         },
         refreshTable(){
             console.log("load table data");
@@ -888,10 +922,10 @@
         this.SiswaDB = new Datastore({ filename: 'SiswaDB.db', autoload: true });
         this.NilaiDB = new Datastore({ filename: 'NilaiDB.db', autoload: true });
         this.DataDB = new Datastore({ filename: 'DataDB.db', autoload: true });
-        this.getDefaultKelas();
+        this.refresh();
     },
     mounted (){
-        this.getKkm();
+        
     }
   }
 </script>

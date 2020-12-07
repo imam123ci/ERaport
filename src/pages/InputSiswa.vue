@@ -176,8 +176,42 @@
     }),
 
     methods : {
-        refresh(){
-            this.getDataSiswa();
+        async refresh(){
+            let isExist = await this.checkIfDBExist();
+            if(isExist){
+                this.getDefaultKelas();
+                this.getDataSiswa();
+            }
+        },
+        async checkIfDBExist(){
+            const dt =  new Promise((resolve,rejects)=>{
+            this.DataDB.find(
+            {},
+            (err,docs)=>{
+              if(err){
+                rejects(false);
+              }
+              else{
+                if(docs.length < 1){
+                  rejects(false)
+                }else{
+                  resolve(true);
+                }
+              }
+            })
+            });
+
+            await dt.then(
+                (rs) =>{
+                if(rs)
+                    return(true);
+                },
+                (rj)=>{
+                if(!rj)
+                    console.log(rj);
+                return(false)
+                }
+            )
         },
         getDefaultKelas(){
             return new Promise((resolve,reject)=>{
@@ -490,7 +524,7 @@
         let Datastore = require('nedb');
         this.SiswaDB = new Datastore({ filename: 'SiswaDB.db', autoload: true });
         this.DataDB = new Datastore({ filename: 'DataDB.db', autoload: true });  
-        this.getDefaultKelas();
+        
     }
 }
     
