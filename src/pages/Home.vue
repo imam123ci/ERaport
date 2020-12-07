@@ -132,185 +132,186 @@
     </template>
 
 
-
-    <v-spacer class="ma-3"></v-spacer>
-    <v-row>
-      <v-col class="col-10 col-md-10 col-sm-12">
-        <h3>Keseluruhan</h3>
-        <v-row>         
-          <v-col>
-            <v-card
-            class="mx-auto">
-              <v-card-text>
-                <div>Total Murid</div>
-                <p class="display-1 text--primary">
-                  {{totalMurid}}
-                </p>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col >
-            <v-card
-            class="mx-auto">
-              <v-card-text>
-                <div>Total Pelajaran</div>
-                <p class="display-1 text--primary">
-                  {{totalPelajaran}}
-                </p>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col >
-          <v-card
-            class="mx-auto">
-              <v-card-text>
-                <div>Total KD</div>
-                <p class="display-1 text--primary">
-                  {{totalKD}}
-                </p>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col>
-            <v-card
+    <div  v-if="!UI.pertama">
+      <v-spacer class="ma-3"></v-spacer>
+      <v-row>
+        <v-col class="col-10 col-md-10 col-sm-12">
+          <h3>Keseluruhan</h3>
+          <v-row>         
+            <v-col>
+              <v-card
               class="mx-auto">
                 <v-card-text>
-                  <div>KKM</div>
+                  <div>Total Murid</div>
                   <p class="display-1 text--primary">
-                    {{kkm}}
+                    {{totalMurid}}
                   </p>
                 </v-card-text>
               </v-card>
-          </v-col>
-        </v-row>
-        <h3>Kelas</h3>
-        <v-row>         
-          <v-col>
+            </v-col>
+            <v-col >
+              <v-card
+              class="mx-auto">
+                <v-card-text>
+                  <div>Total Pelajaran</div>
+                  <p class="display-1 text--primary">
+                    {{totalPelajaran}}
+                  </p>
+                </v-card-text>
+              </v-card>
+            </v-col>
+            <v-col >
             <v-card
-            class="mx-auto">
-              <v-card-text>
-                <div>Total Murid {{UI.SelectedKelas}}</div>
-                <p class="display-1 text--primary">
-                  {{totalMuridKelas}}
-                </p>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col >
+              class="mx-auto">
+                <v-card-text>
+                  <div>Total KD</div>
+                  <p class="display-1 text--primary">
+                    {{totalKD}}
+                  </p>
+                </v-card-text>
+              </v-card>
+            </v-col>
+            <v-col>
+              <v-card
+                class="mx-auto">
+                  <v-card-text>
+                    <div>KKM</div>
+                    <p class="display-1 text--primary">
+                      {{kkm}}
+                    </p>
+                  </v-card-text>
+                </v-card>
+            </v-col>
+          </v-row>
+          <h3>Kelas</h3>
+          <v-row>         
+            <v-col>
+              <v-card
+              class="mx-auto">
+                <v-card-text>
+                  <div>Total Murid {{UI.SelectedKelas}}</div>
+                  <p class="display-1 text--primary">
+                    {{totalMuridKelas}}
+                  </p>
+                </v-card-text>
+              </v-card>
+            </v-col>
+            <v-col >
+              <v-card
+              class="mx-auto">
+                <v-card-text>
+                  <div>Siswa di atas KKM</div>
+                  <p class="display-1 text--primary">
+                    {{nilaiAtasKKM}}
+                  </p>
+                </v-card-text>
+              </v-card>
+            </v-col>
+            <v-col >
+              <v-card
+              class="mx-auto">
+                <v-card-text>
+                  <div>Siswa di bawah KKM</div>
+                  <p class="display-1 text--primary">
+                    {{nilaiBawahKKM}}
+                  </p>
+                </v-card-text>
+              </v-card>
+            </v-col>
+            <v-col >
             <v-card
-            class="mx-auto">
-              <v-card-text>
-                <div>Siswa di atas KKM</div>
-                <p class="display-1 text--primary">
-                  {{nilaiAtasKKM}}
-                </p>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col >
-            <v-card
-            class="mx-auto">
-              <v-card-text>
-                <div>Siswa di bawah KKM</div>
-                <p class="display-1 text--primary">
-                  {{nilaiBawahKKM}}
-                </p>
-              </v-card-text>
-            </v-card>
-          </v-col>
-          <v-col >
+              class="mx-auto">
+                <v-card-text>
+                  <div>Nilai rata-rata</div>
+                  <p class="display-1 text--primary">
+                    {{nilaiRataRata}}
+                  </p>
+                </v-card-text>
+              </v-card>
+            </v-col>
+
+            
+          </v-row>
+        </v-col>
+        <v-col>
+          <v-row>
+            <v-col>
+              <v-card>
+                <v-card-title>
+                  Kelas Default
+                </v-card-title>
+                <v-card-title>
+                  <v-select
+                    label="Kelas"
+                    :items="UI.SelectKelas"
+                    v-model="UI.SelectedKelas"
+                  >
+                  </v-select>
+                  <v-select
+                    label="Rombel"
+                    :items="UI.SelectRombel"
+                    v-model="UI.SelectedRombel"
+                  >
+                  </v-select>
+                </v-card-title>
+                <v-card-actions>
+                  <v-btn @click="setDefaultKelas()">
+                    Set
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-col>  
+          </v-row>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
           <v-card
-            class="mx-auto">
-              <v-card-text>
-                <div>Nilai rata-rata</div>
-                <p class="display-1 text--primary">
-                  {{nilaiRataRata}}
-                </p>
-              </v-card-text>
-            </v-card>
-          </v-col>
-
-          
-        </v-row>
-      </v-col>
-      <v-col>
-        <v-row>
-          <v-col>
-            <v-card>
-              <v-card-title>
-                Kelas Default
-              </v-card-title>
-              <v-card-title>
-                <v-select
-                  label="Kelas"
-                  :items="UI.SelectKelas"
-                  v-model="UI.SelectedKelas"
-                >
-                </v-select>
-                <v-select
-                  label="Rombel"
-                  :items="UI.SelectRombel"
-                  v-model="UI.SelectedRombel"
-                >
-                </v-select>
-              </v-card-title>
-              <v-card-actions>
-                <v-btn @click="setDefaultKelas()">
-                  Set
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-col>  
-        </v-row>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col>
-         <v-card
-        height="350px"
-        >
-        <v-card-title class="mb-0 pb-0">Nilai Rata-Rata</v-card-title>
-        <v-card-text>
-          <div height="200px">
-            <canvas id="graph1" height="250" width="300"></canvas>
-          </div>          
-        </v-card-text>
-
-        
-        </v-card>
-      </v-col>
-      <v-col>
-        <v-card
           height="350px"
-        >
-        <v-card-title class="mb-0 pb-0">Nilai Rata-Rata per Pelajaran</v-card-title>
-        <v-card-text>
-          <div height="200px">
-            <canvas id="graph2" height="250" width="300"></canvas>
-          </div>
-          
-        </v-card-text>
-        </v-card>
+          >
+          <v-card-title class="mb-0 pb-0">Nilai Rata-Rata</v-card-title>
+          <v-card-text>
+            <div height="200px">
+              <canvas id="graph1" height="250" width="300"></canvas>
+            </div>          
+          </v-card-text>
 
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col>
-        <v-card
-        height="400px"
-        >
-        <v-card-title>Rekapitulasi Nilai</v-card-title>
-        <v-card-text>
-         <v-data-table
-            :headers="headersNilai"
-            :items="dataNilai"
-            :items-per-page="15"
-            class="elevation-1"
-          ></v-data-table>
-        </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+          
+          </v-card>
+        </v-col>
+        <v-col>
+          <v-card
+            height="350px"
+          >
+          <v-card-title class="mb-0 pb-0">Nilai Rata-Rata per Pelajaran</v-card-title>
+          <v-card-text>
+            <div height="200px">
+              <canvas id="graph2" height="250" width="300"></canvas>
+            </div>
+            
+          </v-card-text>
+          </v-card>
+
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-card
+          height="400px"
+          >
+          <v-card-title>Rekapitulasi Nilai</v-card-title>
+          <v-card-text>
+          <v-data-table
+              :headers="headersNilai"
+              :items="dataNilai"
+              :items-per-page="15"
+              class="elevation-1"
+            ></v-data-table>
+          </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </div>
 
     <v-snackbar
       v-model="snackbar.status"
@@ -349,9 +350,9 @@
       UI:{
         pertama:false,
         SelectKelas : ["kelas1","kelas2","kelas3","kelas4","kelas5","kelas6"],
-        SelectedKelas : "",
+        SelectedKelas : "kelas1",
         SelectRombel : ['a','b','c','d','e','f','g'],
-        SelectedRombel : "",
+        SelectedRombel : "a",
         SelectedSemester : "Semester 1"
       },
       dataNilai : [],
@@ -367,16 +368,30 @@
       
     }),
     methods : {
-    async refresh(){
-        // Seluruh
-        this.totalMurid = await this.getTotalMurid();
-        this.totalPelajaran = await this.getTotalPelajaran();
-        this.totalKD = await this.getTotalKD();
-        this.kkm = await this.getKKM();
+      async refresh(){
+          // check if data exist
+          let isExist = await this.checkIfDBExist();
+          if(isExist){
+            console.log(isExist);
+          }
+          else{
+            this.UI.pertama = true;
+            return;
+          }
+          // Seluruh
+          this.totalMurid = await this.getTotalMurid();
+          this.totalPelajaran = await this.getTotalPelajaran();
+          this.totalKD = await this.getTotalKD();
+          this.kkm = await this.getKKM();
 
-        //kelas
-        this.totalMuridKelas = await this.getTotalMuridKelas();
-    },
+          //kelas
+          this.totalMuridKelas = await this.getTotalMuridKelas();
+
+          //prepare data
+          if(this.kkm != null && this.totalMurid!=null && this.totalPelajaran != null && this.totalKD != null){
+            this.prepareData();
+          }
+      },
       notify(msg){
         this.snackbar.status = true;
         this.snackbar.text = msg; 
@@ -619,21 +634,20 @@
         return new Promise((resolve, reject)=>{
           let pelajaran = [];
           let syarat = {[kelas]:true};
-          setTimeout(()=>{
-            this.PelajaranDB.find(
-              syarat,
-              {pelajaran:1},
-              (err,docs)=>{
-                if(err){
-                  reject(err);
-                }
-                docs.map((d)=>{
-                  pelajaran.push(d.pelajaran);
-                });
-                resolve(pelajaran);
+          this.PelajaranDB.find(
+            syarat,
+            {pelajaran:1},
+            (err,docs)=>{
+              if(err){
+                reject(err);
               }
-            )
-          },500)
+              docs.map((d)=>{
+                pelajaran.push(d.pelajaran);
+              });
+              resolve(pelajaran);
+            }
+          )
+
         });
       },
 
@@ -892,9 +906,41 @@
         this.graph2.update();
         
         
+      },
+
+      async checkIfDBExist(){
+        const dt =  new Promise((resolve,rejects)=>{
+          this.DataDB.find(
+            {},
+            (err,docs)=>{
+              if(err){
+                rejects(false);
+              }
+              else{
+                if(docs.length < 1){
+                  rejects(false)
+                }else{
+                  resolve(true);
+                }
+              }
+            }
+            )
+        });
+
+        await dt.then(
+          (rs) =>{
+            if(rs)
+              return(true);
+          },
+          (rj)=>{
+            if(!rj)
+              console.log(rj);
+            return(false)
+          }
+        )
       }
 
-    },
+    },  
     mounted() {
       
 
@@ -952,7 +998,6 @@
       this.KdDB = new Datastore({filename: 'KdDB.db', autoload:true});
 
       this.refresh();
-      this.prepareData();
     }
 
   }
